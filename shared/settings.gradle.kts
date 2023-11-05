@@ -11,5 +11,3 @@ plugins {
 }
 
 rootProject.name = "shared"
-
-include("lib")
