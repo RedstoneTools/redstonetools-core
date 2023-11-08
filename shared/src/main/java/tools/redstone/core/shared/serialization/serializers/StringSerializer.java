@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tools.redstone.core.shared.serialization.ISerializer;
+import tools.redstone.core.shared.serialization.IStringReader;
 import tools.redstone.core.shared.serialization.SuggestionContext;
 
 public class StringSerializer implements ISerializer<String> {
@@ -21,24 +22,38 @@ public class StringSerializer implements ISerializer<String> {
     }
 
     @Override
-    public String deserialize(String string) {
-        if (string.charAt(0) != '\"' || string.charAt(string.length() - 1) != '\"') {
-            throw new RuntimeException("Missing quotes");
+    public String deserialize(IStringReader stringReader) {
+        if (stringReader.peek().orElseThrow() == '\"') {
+            return readQuotedString(stringReader);
+        } else {
+            return readUnQuotedString(stringReader);
         }
 
-        return string
-                .substring(1, string.length() - 1)
-                .replace("\\", "\\\\")
-                .replace("\t", "\\t")
-                .replace("\b", "\\b")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\f", "\\f")
-                .replace("\"", "\\\"");
     }
 
     @Override
     public List<String> getSuggestions(SuggestionContext context, String string) {
         return new ArrayList<>();
+    }
+
+    private String readQuotedString(IStringReader stringReader) {
+        stringReader.skip(1); // Skips the opening quote
+        var stringBuilder = new StringBuilder();
+
+        while (true) {
+            var character = stringReader.read().orElseThrow(() -> new RuntimeException("Unexpected end of input"));
+
+            if (character == '\\') {
+                stringBuilder.append(stringReader.read().orElseThrow());
+            } else if (character == '\"') {
+                return stringBuilder.toString();
+            } else {
+                stringBuilder.append(character);
+            }
+        }
+    }
+
+    private String readUnQuotedString(IStringReader stringReader) {
+        return stringReader.readWord();
     }
 }

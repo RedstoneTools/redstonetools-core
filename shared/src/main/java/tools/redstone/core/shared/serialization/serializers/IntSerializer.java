@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tools.redstone.core.shared.serialization.ISerializer;
+import tools.redstone.core.shared.serialization.IStringReader;
 import tools.redstone.core.shared.serialization.SuggestionContext;
 
 public class IntSerializer implements ISerializer<Integer> {
@@ -23,7 +24,9 @@ public class IntSerializer implements ISerializer<Integer> {
     }
 
     @Override
-    public Integer deserialize(String string) {
+    public Integer deserialize(IStringReader stringReader) {
+        var string = stringReader.readWord();
+
         var value = Integer.parseInt(string);
         checkBounds(value);
         return value;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tools.redstone.core.shared.serialization.ISerializer;
+import tools.redstone.core.shared.serialization.IStringReader;
 import tools.redstone.core.shared.serialization.SuggestionContext;
 
 public class BooleanSerializer implements ISerializer<Boolean> {
@@ -16,7 +17,9 @@ public class BooleanSerializer implements ISerializer<Boolean> {
     }
 
     @Override
-    public Boolean deserialize(String string) {
+    public Boolean deserialize(IStringReader stringReader) {
+        String string = stringReader.readWord();
+
         if (string.equals("true")) {
             return true;
         } else if (string.equals("false")) {
