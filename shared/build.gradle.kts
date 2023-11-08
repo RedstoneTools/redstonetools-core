@@ -5,16 +5,39 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.4/userguide/building_java_projects.html in the Gradle documentation.
  */
 
-plugins { `java` }
+plugins { java }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
-dependencies {}
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
 
 group = "tools.redstone.core"
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+
+    maxHeapSize = "1G"
+
+    testLogging { events("passed") }
+}
+
+sourceSets {
+    main {
+        java.srcDirs("src/main/java")
+        resources.srcDirs("src/main/resources")
+    }
+
+    test {
+        java.srcDirs("src/test/java")
+        resources.srcDirs("src/test/resources")
+    }
+}
 
 // Apply a specific Java toolchain to ease working on different environments.
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
